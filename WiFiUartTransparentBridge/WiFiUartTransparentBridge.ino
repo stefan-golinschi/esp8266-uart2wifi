@@ -8,24 +8,20 @@
 #include <ESP8266WiFi.h>
 #include "config.h"
 
-//#define STATIC_IP_ADDR
-
 WiFiServer localServer(networkport);
 WiFiClient localClient;
 
-#ifdef STATIC_IP_ADDR
-IPAddress staticIP(192,168,0,25);
-IPAddress gateway(192,168,0,1);
+IPAddress local_IP(10,10,10,1);
+IPAddress gateway(10,10,10,1);
 IPAddress subnet(255,255,255,0);
-#endif
 
 void setup() {
-  Serial.begin(baudrate);
-  WiFi.begin(ssid, password);
-#ifdef STATIC_IP_ADDR
-  WiFi.config(staticIP, gateway, subnet);
-#endif
-  Serial.print("\nConnecting to "); Serial.println(ssid);
+  Serial.begin(baudrate, SERIAL_8N1);
+  
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+  WiFi.softAP(ssid, password, channel, hidden, max_connection);
+
+  Serial.swap();
   
   uint8_t i = 0;
   while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
