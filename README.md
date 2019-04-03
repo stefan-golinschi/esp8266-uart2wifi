@@ -1,18 +1,41 @@
 
-# ESP8266-WiFi-UART-transparent-bridge
+# ESP8266-uart2wifi
 Transparent serial communication sketch in Arduino IDE.  
+This is useful for remote uart debugging.
 
-Is anyone interested in serial communication over the internet?  
-[ESP8266-Azure-IoT-Hub-UART-transparent-bridge ](https://github.com/NaoNaoMe/ESP8266-Azure-IoT-Hub-UART-transparent-bridge) might be a good example.
+# How it works
+Using the default settings from ``config.h``, the 8266 module will create a **hidden** AP with the following settings:  
 
-This sketch used with [RM Classic](https://github.com/NaoNaoMe/RM-Classic).  
-You could find a tutorial on my [youtube channel](https://youtu.be/QDO9URz7r5U).  
+ * **SSID**: ``openNAS_debug``
 
-People who visit this repository might be interested in the [UartWiFiBoard](https://github.com/NaoNaoMe/Uart-WiFi-Board).
+ * **PSK**: ``RHbuQ5hKIdAt``
 
-The UartWiFiBoard is battery-powered stand-alone uart-wifi board so that the board can establish connection wifi network by itself.  
-You can communicate uart data over wifi, when you connect to the board's ip address by terminal apps.  
-When you send messages to the board's ip address, the board transmit uart data to your target and vice-versa.  
+Then, it will listen on ``23/TCP``.
 
-![UartWiFiBoardwithArduinoUNO](mdContents/UartWifiBoardwithArduinoUNO.png)  
+To send and receive UART info from the target board, you should use ``telnet`` with ``mode character`` enabled. Also, double-check that the baudrate defined in ``config.h`` matches the target board's baudrate.
+
+### Example:
+```
+# connect to 8266's SSID, then run telnet
+telnet 10.10.10.1 23
+
+# escape using CTRL+]
+mode character
+
+# continue by hitting RETURN
+```
+
+
+
+# Tested on
+So far it's tested on an Wemos R1 mini board, using UART0.
+
+| R1 mini pin# | Target board pin# |
+|--------------|-------------------|
+| D7 [RX2]     | UART_TX           |
+| D8 [TX2]     | UART_RX           |
+| G  [GND]     | GND               |
+
+
+**NOTICE**: When programming the R1 mini, you should not connect the UART wires to your target board. The communication will only work after the ``Serial.swap()`` call. Read more [here](https://arduino-esp8266.readthedocs.io/en/latest/reference.html#serial).
 
